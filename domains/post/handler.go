@@ -1,7 +1,11 @@
 package post
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+
+	"instagram2/http/utils"
 )
 
 type PostHandler struct {
@@ -19,9 +23,25 @@ func NewPostHandler(service *PostService) *PostHandler {
 }
 
 func (h *PostHandler) InitializeRoutes() *http.ServeMux {
-	h.Handler.HandleFunc("GET /hola/", h.getPosts)
+	h.Handler.HandleFunc("POST /create-post/", h.createPost)
 	return h.Handler
 }
-func (h *PostHandler) getPosts(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(h.service.Greetings()))
+
+func (h *PostHandler) createPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("POST: create-post started()...")
+
+	decoder := json.NewDecoder(r.Body)
+	var post Post
+	err := decoder.Decode(&post)
+	if err != nil {
+		fmt.Println("Error con las propiedades")
+	}
+	fmt.Println("POST: create-post body: ", post)
+
+	createPost := h.service.CreatePost(post)
+
+	response := utils.CreateNewResponse(200, "success", createPost)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }

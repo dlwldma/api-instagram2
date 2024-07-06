@@ -1,16 +1,21 @@
 package post
 
 import (
+	"context"
 	"instagram2/db"
 )
 
 type MongoPostRepo struct {
+	Mongo *db.Mongo
 }
 
-func NewMongoPostRepo(client *db.Mongo) *MongoPostRepo {
-	return &MongoPostRepo{}
+func NewMongoPostRepo(mongo *db.Mongo) *MongoPostRepo {
+	return &MongoPostRepo{
+		Mongo: mongo,
+	}
 }
 
-func (r *MongoPostRepo) GetPosts() []string {
-	return []string{"", ""}
+func (r *MongoPostRepo) InsertPost(post Post) string {
+	r.Mongo.Client.InsertOne(context.TODO(), post)
+	return "creado con exito"
 }

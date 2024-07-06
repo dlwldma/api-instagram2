@@ -1,5 +1,5 @@
 package post
 
 type PostRepo interface {
-	GetPosts() []string
+	InsertPost(post Post) string
 }

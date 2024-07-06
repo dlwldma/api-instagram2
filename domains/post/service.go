@@ -10,6 +10,7 @@ func NewPostService(repo PostRepo) *PostService {
 	}
 }
 
-func (s *PostService) Greetings() string {
-	return "Hola humano desde service!!! :) "
+func (s *PostService) CreatePost(post Post) string {
+	s.repo.InsertPost(post)
+	return "Post creado con exito!"
 }

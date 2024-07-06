@@ -10,8 +10,8 @@ type PostModule struct {
 }
 
 func NewPostModule() *PostModule {
-	client := db.NewMongoDb()
-	repo := NewMongoPostRepo(client)
+	collection := db.NewMongoDb("post")
+	repo := NewMongoPostRepo(collection)
 	service := NewPostService(repo)
 	handler := NewPostHandler(service)
 
