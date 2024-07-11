@@ -31,14 +31,13 @@ func (h *PostHandler) createPost(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("POST: create-post started()...")
 
 	decoder := json.NewDecoder(r.Body)
-	var post Post
-	err := decoder.Decode(&post)
+	var body CreatePostDto
+	err := decoder.Decode(&body)
 	if err != nil {
 		fmt.Println("Error con las propiedades")
 	}
-	fmt.Println("POST: create-post body: ", post)
 
-	createPost := h.service.CreatePost(post)
+	createPost := h.service.CreatePost(body)
 
 	response := utils.CreateNewResponse(200, "success", createPost)
 
