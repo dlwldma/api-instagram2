@@ -69,15 +69,13 @@ func (fd *FormData) getTemporalFile(part *multipart.Part) *os.File {
 	var filesize int
 	var uploaded bool
 
-	tempfile, err = os.CreateTemp(os.TempDir(), "image*.png")
+	tempfile, err = os.CreateTemp(os.TempDir(), "image*.tmp")
 	if err != nil {
 		fmt.Printf("Hit error while creating temp file: %s", err.Error())
 		fmt.Println("Error occured during upload")
 		return nil
 	}
 	log.Printf("Temporary filename: %s\n", tempfile.Name())
-	defer tempfile.Close()
-	defer os.Remove(tempfile.Name())
 
 	for !uploaded {
 		if n, err = part.Read(chunk); err != nil {
@@ -105,6 +103,8 @@ func (fd *FormData) getTemporalFile(part *multipart.Part) *os.File {
 
 	length, _ := tempfile.Stat()
 	log.Printf("Uploaded filesize: %d bytes", length.Size())
+	defer tempfile.Close()
+	defer os.Remove(tempfile.Name())
 
 	return tempfile
 }
