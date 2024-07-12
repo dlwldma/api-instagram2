@@ -1,5 +1,9 @@
 package post
 
+import (
+	"os"
+)
+
 type PostStorage interface {
-	UploadImages(images64 []string, filename string) ([]string, error)
+	UploadImage(file *os.File, filename string) ([]string, error)
 }

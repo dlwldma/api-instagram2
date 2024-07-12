@@ -1,6 +1,7 @@
 package post
 
 import (
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,7 +22,7 @@ func (s *PostService) CreatePost(body CreatePostDto) string {
 	time_now := time.Now()
 	post_id := uuid.New().String()
 	filename := s.CreateFilename(post_id, body.UserId, &time_now)
-	img_url := s.EncodeImage64(body.ImageUris64, filename)
+	img_url := s.UploadContent(body.File, filename)
 	post := &Post{
 		Id:          post_id,
 		UserId:      body.UserId,
@@ -35,8 +36,8 @@ func (s *PostService) CreatePost(body CreatePostDto) string {
 	return "Post creado con exito!"
 }
 
-func (s *PostService) EncodeImage64(image_uris []string, filename string) []string {
-	image_urls, _ := s.storage.UploadImages(image_uris, filename)
+func (s *PostService) UploadContent(tempfile *os.File, filename string) []string {
+	image_urls, _ := s.storage.UploadImage(tempfile, filename)
 	return image_urls
 }
 

@@ -21,10 +21,7 @@ func NewSupabaseClient() *Supabase {
 	STORAGE_URL := os.Getenv("SUPABASE_STORAGE_URL")
 	API_SECRET_KEY := os.Getenv("SUPABASE_PRIVATE_KEY")
 
-	headers := map[string]string{
-		"Content-Type": "image/png",
-	}
-	storageClient := storage_go.NewClient(STORAGE_URL, API_SECRET_KEY, headers)
+	storageClient := storage_go.NewClient(STORAGE_URL, API_SECRET_KEY, nil)
 	return &Supabase{
 		Storage: storageClient,
 	}
