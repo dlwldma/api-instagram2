@@ -2,7 +2,6 @@ package post
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -30,21 +29,31 @@ func (h *PostHandler) InitializeRoutes() *http.ServeMux {
 
 func (h *PostHandler) createPost(w http.ResponseWriter, r *http.Request) {
 	log.Println("POST: create-post started()...")
+	var formData *utils.FormData
+	var formValues map[string]any
 	var response *utils.HttpResponse
+	var err error
 
-	formData, err := utils.NewFormData(r)
-	if err != nil {
-		response = utils.CreateNewResponse(400, "error", err.Error())
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+	if formData, err = utils.NewFormData(r); err != nil {
+		utils.HandleError(w, err)
 		return
 	}
 
-	dto, err := formData.GetFormData()
-	if err != nil {
-		fmt.Println("No se pudieron obtener los datos del form data")
+	if formValues, err = formData.GetFormData(); err != nil {
+		utils.HandleError(w, err)
+		return
 	}
 
+	jsonbody, _ := json.Marshal(formValues)
+	dto := CreatePostDto{}
+	if err = json.Unmarshal(jsonbody, &dto); err != nil {
+		utils.HandleError(w, err)
+		return
+	}
+	if _, err = utils.AreAllFieldsSet(dto); err != nil {
+		utils.HandleError(w, err)
+		return
+	}
 	log.Println("POST: create-post body...", dto)
 
 	//createPost := h.service.CreatePost(dto)
@@ -52,4 +61,5 @@ func (h *PostHandler) createPost(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+	log.Println("POST: create-post ended()...")
 }

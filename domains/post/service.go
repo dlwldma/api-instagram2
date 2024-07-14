@@ -22,7 +22,7 @@ func (s *PostService) CreatePost(body CreatePostDto) string {
 	time_now := time.Now()
 	post_id := uuid.New().String()
 	filename := s.CreateFilename(post_id, body.UserId, &time_now)
-	img_url := s.UploadContent(body.File, filename)
+	img_url := s.UploadContent(body.Files[0], filename)
 	post := &Post{
 		Id:          post_id,
 		UserId:      body.UserId,

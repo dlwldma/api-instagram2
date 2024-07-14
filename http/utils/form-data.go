@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -34,7 +35,6 @@ func (fd *FormData) GetFormData() (map[string]any, error) {
 		if part, err = fd.mr.NextPart(); err != nil {
 			if err != io.EOF {
 				log.Printf("Hit error while fetching next part: %s", err.Error())
-				fmt.Println("Error occured during upload")
 				return nil, err
 			}
 			return data, nil
@@ -44,8 +44,8 @@ func (fd *FormData) GetFormData() (map[string]any, error) {
 		name := part.FormName()
 
 		if filename == "" {
-			value, _ := fd.getValueFromPart(part)
-			data[name] = value
+			text := fd.getText(part)
+			data[name] = text
 		} else {
 			file := fd.getTemporalFile(part)
 			files = append(files, file)
@@ -54,19 +54,10 @@ func (fd *FormData) GetFormData() (map[string]any, error) {
 	}
 }
 
-func (fd *FormData) getValueFromPart(part *multipart.Part) (int, error) {
-	var value int
-	var err error
-	for {
-		if value, err = part.Read(make([]byte, 4096)); err != nil {
-			if err != io.EOF {
-				log.Printf("Hit error while fetching next part: %s", err.Error())
-				fmt.Println("Error occured during upload")
-				return 0, err
-			}
-			return value, nil
-		}
-	}
+func (fd *FormData) getText(part *multipart.Part) string {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(part)
+	return buf.String()
 }
 
 func (fd *FormData) getTemporalFile(part *multipart.Part) *os.File {
