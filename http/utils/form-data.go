@@ -1,10 +1,12 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
+	"net/http"
 	"os"
 )
 
@@ -12,10 +14,15 @@ type FormData struct {
 	mr *multipart.Reader
 }
 
-func NewFormData(mr *multipart.Reader) *FormData {
+func NewFormData(r *http.Request) (*FormData, error) {
+	mr, err := r.MultipartReader()
+	if err != nil {
+		log.Println("Error con reader --", err)
+		return nil, errors.New("error when creating new multipart.Reader")
+	}
 	return &FormData{
 		mr: mr,
-	}
+	}, nil
 }
 
 func (fd *FormData) GetFormData() (map[string]any, error) {

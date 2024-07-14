@@ -30,9 +30,15 @@ func (h *PostHandler) InitializeRoutes() *http.ServeMux {
 
 func (h *PostHandler) createPost(w http.ResponseWriter, r *http.Request) {
 	log.Println("POST: create-post started()...")
+	var response *utils.HttpResponse
 
-	mr, _ := r.MultipartReader()
-	formData := utils.NewFormData(mr)
+	formData, err := utils.NewFormData(r)
+	if err != nil {
+		response = utils.CreateNewResponse(400, "error", err.Error())
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
 
 	dto, err := formData.GetFormData()
 	if err != nil {
@@ -42,7 +48,7 @@ func (h *PostHandler) createPost(w http.ResponseWriter, r *http.Request) {
 	log.Println("POST: create-post body...", dto)
 
 	//createPost := h.service.CreatePost(dto)
-	response := utils.CreateNewResponse(200, "success", nil)
+	response = utils.CreateNewResponse(200, "success", nil)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
