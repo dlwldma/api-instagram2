@@ -29,6 +29,7 @@ func (fd *FormData) GetFormData() (map[string]any, error) {
 	var part *multipart.Part
 	var err error
 	var data = map[string]any{}
+	var files = []*os.File{}
 	for {
 		if part, err = fd.mr.NextPart(); err != nil {
 			if err != io.EOF {
@@ -47,7 +48,8 @@ func (fd *FormData) GetFormData() (map[string]any, error) {
 			data[name] = value
 		} else {
 			file := fd.getTemporalFile(part)
-			data[name] = file
+			files = append(files, file)
+			data[name] = files
 		}
 	}
 }
